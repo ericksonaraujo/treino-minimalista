@@ -1209,7 +1209,9 @@ renderExGrid();
 initDrag();
 
 // ── PWA: MANIFEST & ÍCONE ──
-const CUSTOM_ICON_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+function buildIconAsync(size) {
+  return new Promise(resolve => {
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg id="Camada_1" data-name="Camada 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000">
   <defs>
     <style>
@@ -1229,31 +1231,21 @@ const CUSTOM_ICON_SVG = `<?xml version="1.0" encoding="UTF-8"?>
   </defs>
   <rect class="cls-2" width="1000" height="1000"/>
   <path class="cls-1" d="M300.22,399.9h239.28c7.18,0,13-5.82,13-13v-150.23c0-13.62,18.29-18.07,24.55-5.97l134.29,259.83c4.47,8.65-1.81,18.97-11.55,18.97h-176.86c-7.18,0-13,5.82-13,13v244.16c0,13.41-17.84,18.04-24.36,6.32l-196.71-353.76c-4.82-8.66,1.45-19.32,11.36-19.32ZM425.19,223.92c-37.3,0-67.53,30.24-67.53,67.53s30.24,67.53,67.53,67.53,67.53-30.24,67.53-67.53-30.24-67.53-67.53-67.53Z"/>
-</svg>`;
-
-function buildIconAsync(size) {
-  return new Promise(resolve => {
+</svg>``;
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
       c.width = c.height = size;
-      const ctx = c.getContext('2d');
-      ctx.clearRect(0, 0, size, size);
-      ctx.drawImage(img, 0, 0, size, size);
+      c.getContext('2d').drawImage(img, 0, 0, size, size);
       URL.revokeObjectURL(img.src);
       resolve(c.toDataURL('image/png'));
     };
-    img.src = URL.createObjectURL(new Blob([CUSTOM_ICON_SVG], { type: 'image/svg+xml' }));
+    img.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
   });
 }
 
 async function setupPWA() {
-  const [ico180, ico192, ico512] = await Promise.all([
-    buildIconAsync(180),
-    buildIconAsync(192),
-    buildIconAsync(512)
-  ]);
-
+  const [ico192, ico512] = await Promise.all([buildIconAsync(192), buildIconAsync(512)]);
   const manifest = {
     name: "Treino Minimalista",
     short_name: "Treino",
@@ -1268,36 +1260,17 @@ async function setupPWA() {
       { src: ico512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
     ]
   };
-
-  const oldManifest = document.querySelector('link[rel="manifest"]');
-  if (oldManifest) oldManifest.remove();
-
   const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
   const mLink = document.createElement('link');
-  mLink.rel = 'manifest';
-  mLink.href = URL.createObjectURL(mBlob);
+  mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(mBlob);
   document.head.appendChild(mLink);
-
-  const setHeadIcon = (rel, href, sizes='') => {
-    let link = document.head.querySelector(`link[rel="${rel}"]`);
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = rel;
-      document.head.appendChild(link);
-    }
-    if (sizes) link.sizes = sizes;
-    link.href = href;
-  };
-
-  setHeadIcon('apple-touch-icon', ico180, '180x180');
-  setHeadIcon('icon', ico192, '192x192');
 }
 
 setupPWA();
 
 // ── PWA: SERVICE WORKER ──
 const swCode = `
-const CACHE = 'treino-v1';
+const CACHE = 'treino-v2';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['.'])));
   self.skipWaiting();
