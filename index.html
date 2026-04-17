@@ -1211,27 +1211,7 @@ initDrag();
 // ── PWA: MANIFEST & ÍCONE ──
 function buildIconAsync(size) {
   return new Promise(resolve => {
-    const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Camada_1" data-name="Camada 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: url(#Gradiente_sem_nome_221);
-      }
-
-      .cls-2 {
-        fill: #080808;
-      }
-    </style>
-    <linearGradient id="Gradiente_sem_nome_221" data-name="Gradiente sem nome 221" x1="325.34" y1="295.79" x2="655.81" y2="626.26" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ff9733"/>
-      <stop offset=".54" stop-color="#ff7a1f"/>
-      <stop offset="1" stop-color="#d23c1f"/>
-    </linearGradient>
-  </defs>
-  <rect class="cls-2" width="1000" height="1000"/>
-  <path class="cls-1" d="M300.22,399.9h239.28c7.18,0,13-5.82,13-13v-150.23c0-13.62,18.29-18.07,24.55-5.97l134.29,259.83c4.47,8.65-1.81,18.97-11.55,18.97h-176.86c-7.18,0-13,5.82-13,13v244.16c0,13.41-17.84,18.04-24.36,6.32l-196.71-353.76c-4.82-8.66,1.45-19.32,11.36-19.32ZM425.19,223.92c-37.3,0-67.53,30.24-67.53,67.53s30.24,67.53,67.53,67.53,67.53-30.24,67.53-67.53-30.24-67.53-67.53-67.53Z"/>
-</svg>``;
+    const svg = '<?xml version="1.0" encoding="UTF-8"?>\n<svg id="Camada_1" data-name="Camada 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000">\n  <defs>\n    <style>\n      .cls-1 {\n        fill: url(#Gradiente_sem_nome_221);\n      }\n\n      .cls-2 {\n        fill: #080808;\n      }\n    </style>\n    <linearGradient id="Gradiente_sem_nome_221" data-name="Gradiente sem nome 221" x1="350.27" y1="325.17" x2="633.58" y2="608.48" gradientUnits="userSpaceOnUse">\n      <stop offset="0" stop-color="#ff9733"/>\n      <stop offset=".54" stop-color="#ff7a1f"/>\n      <stop offset="1" stop-color="#d23c1f"/>\n    </linearGradient>\n  </defs>\n  <rect class="cls-2" width="1000" height="1000"/>\n  <path class="cls-1" d="M328.73,414.43h205.14c6.16,0,11.14-4.99,11.14-11.14v-128.79c0-11.68,15.68-15.49,21.05-5.12l115.12,222.75c3.83,7.42-1.55,16.26-9.9,16.26h-151.62c-6.16,0-11.14,4.99-11.14,11.14v209.31c0,11.5-15.3,15.46-20.88,5.42l-168.64-303.28c-4.13-7.43,1.24-16.56,9.74-16.56ZM435.87,263.55c-31.97,0-57.89,25.92-57.89,57.89s25.92,57.89,57.89,57.89,57.89-25.92,57.89-57.89-25.92-57.89-57.89-57.89Z"/>\n</svg>';
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
@@ -1270,7 +1250,7 @@ setupPWA();
 
 // ── PWA: SERVICE WORKER ──
 const swCode = `
-const CACHE = 'treino-v2';
+const CACHE = 'treino-v1';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['.'])));
   self.skipWaiting();
