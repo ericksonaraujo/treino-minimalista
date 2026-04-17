@@ -1209,92 +1209,51 @@ renderExGrid();
 initDrag();
 
 // ── PWA: MANIFEST & ÍCONE ──
+const CUSTOM_ICON_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_1" data-name="Camada 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Gradiente_sem_nome_221);
+      }
+
+      .cls-2 {
+        fill: #080808;
+      }
+    </style>
+    <linearGradient id="Gradiente_sem_nome_221" data-name="Gradiente sem nome 221" x1="325.34" y1="295.79" x2="655.81" y2="626.26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff9733"/>
+      <stop offset=".54" stop-color="#ff7a1f"/>
+      <stop offset="1" stop-color="#d23c1f"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-2" width="1000" height="1000"/>
+  <path class="cls-1" d="M300.22,399.9h239.28c7.18,0,13-5.82,13-13v-150.23c0-13.62,18.29-18.07,24.55-5.97l134.29,259.83c4.47,8.65-1.81,18.97-11.55,18.97h-176.86c-7.18,0-13,5.82-13,13v244.16c0,13.41-17.84,18.04-24.36,6.32l-196.71-353.76c-4.82-8.66,1.45-19.32,11.36-19.32ZM425.19,223.92c-37.3,0-67.53,30.24-67.53,67.53s30.24,67.53,67.53,67.53,67.53-30.24,67.53-67.53-30.24-67.53-67.53-67.53Z"/>
+</svg>`;
+
 function buildIconAsync(size) {
   return new Promise(resolve => {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
-      <defs>
-        <linearGradient id="fig" x1="45%" y1="10%" x2="55%" y2="95%">
-          <stop offset="0%" stop-color="#ffaa44"/>
-          <stop offset="100%" stop-color="#cc4400"/>
-        </linearGradient>
-      </defs>
-      <rect width="1000" height="1000" fill="#0a0a0a"/>
-      <!-- Head -->
-      <circle cx="408" cy="248" r="92" fill="url(#fig)"/>
-      <!-- Body: one unified path tracing the dynamic figure -->
-      <!-- Upper-right arm triangle + torso + lower-left leg, with inner cutout -->
-      <path fill="url(#fig)" fill-rule="evenodd" d="
-        M 260,430
-        L 500,430
-        L 500,790
-        L 420,790
-        L 420,530
-        L 260,530
-        Z
-        M 500,430
-        L 500,530
-        L 620,530
-        L 620,430
-        Z
-        M 560,160
-        L 740,160
-        L 740,240
-        L 640,430
-        L 560,430
-        L 660,240
-        L 560,240
-        Z
-      " stroke="none"/>
-      <!-- Cleaner unified shape -->
-      <path fill="url(#fig)" d="
-        M 258,408
-        C 258,395 268,385 281,385
-        L 492,385
-        L 590,175
-        C 596,162 610,156 623,161
-        L 726,205
-        C 742,212 748,232 739,247
-        L 632,433
-        L 726,433
-        C 742,433 755,446 755,462
-        L 755,540
-        C 755,556 742,569 726,569
-        L 554,569
-        L 554,795
-        C 554,811 541,824 525,824
-        L 415,824
-        C 399,824 386,811 386,795
-        L 386,569
-        L 281,569
-        C 265,569 252,556 252,540
-        L 252,462
-        C 252,446 265,433 281,433
-        L 383,433
-        L 383,408
-        Z
-        M 383,433
-        L 492,433
-        L 554,433
-        L 554,569
-        L 386,569
-        L 386,433
-        Z
-      " stroke="none"/>
-    </svg>`;
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
       c.width = c.height = size;
-      c.getContext('2d').drawImage(img, 0, 0, size, size);
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
       URL.revokeObjectURL(img.src);
       resolve(c.toDataURL('image/png'));
     };
-    img.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    img.src = URL.createObjectURL(new Blob([CUSTOM_ICON_SVG], { type: 'image/svg+xml' }));
   });
 }
 
 async function setupPWA() {
-  const [ico192, ico512] = await Promise.all([buildIconAsync(192), buildIconAsync(512)]);
+  const [ico180, ico192, ico512] = await Promise.all([
+    buildIconAsync(180),
+    buildIconAsync(192),
+    buildIconAsync(512)
+  ]);
+
   const manifest = {
     name: "Treino Minimalista",
     short_name: "Treino",
@@ -1309,10 +1268,29 @@ async function setupPWA() {
       { src: ico512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
     ]
   };
+
+  const oldManifest = document.querySelector('link[rel="manifest"]');
+  if (oldManifest) oldManifest.remove();
+
   const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
   const mLink = document.createElement('link');
-  mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(mBlob);
+  mLink.rel = 'manifest';
+  mLink.href = URL.createObjectURL(mBlob);
   document.head.appendChild(mLink);
+
+  const setHeadIcon = (rel, href, sizes='') => {
+    let link = document.head.querySelector(`link[rel="${rel}"]`);
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = rel;
+      document.head.appendChild(link);
+    }
+    if (sizes) link.sizes = sizes;
+    link.href = href;
+  };
+
+  setHeadIcon('apple-touch-icon', ico180, '180x180');
+  setHeadIcon('icon', ico192, '192x192');
 }
 
 setupPWA();
