@@ -1231,6 +1231,18 @@ function buildIconAsync(size) {
 }
 
 async function setupPWA() {
+  // Fetch icon.png from server and convert to base64 for the manifest
+  let iconData = '';
+  try {
+    const res = await fetch('icon.png');
+    const blob = await res.blob();
+    iconData = await new Promise(resolve => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.readAsDataURL(blob);
+    });
+  } catch(e) {}
+
   const manifest = {
     name: "Treino Minimalista",
     short_name: "Treino",
@@ -1241,8 +1253,8 @@ async function setupPWA() {
     theme_color: "#080808",
     orientation: "portrait",
     icons: [
-      { src: "icon.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-      { src: "icon.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      { src: iconData || "icon.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+      { src: iconData || "icon.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
     ]
   };
   const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
