@@ -1215,23 +1215,8 @@ function buildIconAsync(size) {
         </linearGradient>
       </defs>
       <rect width="1000" height="1000" fill="#080808"/>
-      <!-- Head -->
       <circle cx="405" cy="252" r="90" fill="url(#fig)"/>
-      <!-- Body: single unified path — arm up-right, torso, leg down-left -->
-      <path fill="url(#fig)" d="
-        M 438,368
-        L 690,168
-        L 728,196
-        L 608,415
-        L 748,415
-        L 748,558
-        L 532,558
-        L 392,802
-        L 278,802
-        L 278,558
-        L 438,558
-        Z
-      "/>
+      <path fill="url(#fig)" d="M438,368 L690,168 L728,196 L608,415 L748,415 L748,558 L532,558 L392,802 L278,802 L278,558 L438,558 Z"/>
     </svg>`;
     const img = new Image();
     img.onload = () => {
